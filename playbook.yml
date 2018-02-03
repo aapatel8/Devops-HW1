@@ -24,7 +24,7 @@
 - hosts: main
 
   vars:
-    mysql_password: 12345
+    mysql_password: "{{ lookup('env','MYSQL_PASS') }}"
 
   tasks:
     - name: Clone Onboarding
