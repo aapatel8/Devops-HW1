@@ -1,0 +1,81 @@
+---
+- hosts:
+    - main
+    - test
+
+  vars: 
+    packages:
+      - git
+      - default-jdk
+      - maven
+      - mysql-server-5.7
+      - python-mysqldb
+      - chromium-chromedriver
+
+  tasks: 
+    - name: Install packages
+      become: yes
+      apt: 
+        pkg: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items: "{{ packages }}"
+
+- hosts: main
+
+  vars:
+    mysql_password: 12345
+
+  tasks:
+    - name: Clone Onboarding
+      git:
+        repo: 'git@github.ncsu.edu:engr-csc326-staff/Onboarding.git'
+        dest: /home/vagrant/coffeemaker
+        accept_hostkey: yes
+        clone: yes
+        update: no
+        key_file: /home/vagrant/shared_data/id_rsa_node0
+
+    - name: Add hibernate.cfg.xml
+      template:
+        src: ~/shared_data/templates/hibernate.cfg.xml
+        dest: ~/coffeemaker/CoffeeMaker/src/main/resources/hibernate.cfg.xml
+
+    - name: Add my.cnf for mysql
+      template:
+        src: ~/shared_data/templates/my.cnf
+        dest: ~/.my.cnf
+
+    - name: Add mysql user
+      mysql_user:
+        name: root
+        password: "{{ mysql_password }}"
+        priv: '*.*:ALL'
+        login_user: root
+        login_password: "{{ mysql_password }}"
+        state: present
+      become: yes
+
+    - name: Run Coffeemaker
+      command: mvn -f ./coffeemaker/CoffeeMaker/ spring-boot:run
+
+- hosts: test
+
+  vars:
+    node1host: 192.168.33.91
+
+  tasks:
+    - name: Clone Onboarding-Selenium
+      git:
+        repo: 'git@github.com:CSC-326/Onboarding-Selenium.git'
+        dest: /home/vagrant/coffeemaker-selenium
+        accept_hostkey: yes
+        clone: yes
+        update: no
+        key_file: /home/vagrant/shared_data/id_rsa_node1
+
+    - name: Port forwarding
+      command: "ssh -f -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -L 8080:{{ node1host }}:8080 localhost sleep 15"
+
+    - name: Run mvn tests
+      command: mvn -f ./coffeemaker-selenium/src/ test

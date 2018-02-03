@@ -1,1 +1,12 @@
-# CSC519-HW1
+# CSC519 - HW1
+
+* Vagrantfile.server - The Vagrantfile used to setup server
+* Vagrantfile.node1 - The Vagrantfile used to setup first node
+* Vagrantfile.node2 - The Vagrantfile used to setup second node
+
+As shown in demo, to run coffeemaker and the selenium tests successfully: 
+* First run "ansible-playbook playbook.yml -i inventory -l main" and wait for application to start
+* Then, run "ansible-playbook playbook.yml -i inventory -l test" and wait for maven to complete tests
+	* Not mentioned in demo, to successfully enable port forwarding in the playbook, run "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys" first to allow localhost to ssh itself
+
+* Screencast -
