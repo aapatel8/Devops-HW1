@@ -11,4 +11,4 @@ As shown in demo, to run coffeemaker and the selenium tests successfully:
 	* Not mentioned in the demo, to successfully enable port forwarding in the playbook, run "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys" first to allow localhost to ssh itself
 
 
-* Screencast - https://youtu.be/d1gc3fqJB64
+* Screencast - https://youtu.be/JMUPdHXVd_M
